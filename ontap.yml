@@ -1,0 +1,81 @@
+---
+- hosts: localhost
+  gather_facts: false
+  name: Connectivity Test & Display ONTAP Info
+  tasks:
+    - name: "Collect ONTAP info"
+      netapp.ontap.na_ontap_rest_info:
+        hostname: cluster1.demo.netapp.com
+        username: admin
+        password: Netapp1!
+        https: true
+        validate_certs: false
+        gather_subset: "svm/svms"
+        owning_resource:
+          svm_name: "*"
+      register: info
+
+    - name: List mapped LUNs using rest-cli modules
+      netapp.ontap.na_ontap_rest_info:
+        hostname: cluster1.demo.netapp.com
+        username: admin
+        password: Netapp1!
+        gather_subset:
+          - protocols/san/lun-maps
+        https: true
+        validate_certs: false
+      register: output
+
+    - name: Print ONTAP Response
+      debug:
+        msg: "{{ info }}"
+
+    - name: Print LUN Mappings Response
+      debug:
+        msg: "{{ output }}"
+
+    - name: Filter LUNs for specified igroup
+      set_fact:
+        filtered_luns: "{{ output.ontap_info['protocols/san/lun-maps'].records | selectattr('igroup.name', 'equalto', 'ig_' + server | replace('-', '_')) | list }}"
+
+    - name: Print filtered LUNs
+      debug:
+        msg: "{{ filtered_luns }}"
+    
+    - name: Extract LUN details
+      set_fact:
+        lun_name_details: "{{ filtered_luns | map(attribute='lun.name') | list }}"
+        lun_uuid_details: "{{ filtered_luns | map(attribute='lun.uuid') | list }}"
+        igroup_name_details: "{{ filtered_luns | map(attribute='igroup.name') | list }}"
+        igroup_uuid_details: "{{ filtered_luns | map(attribute='igroup.uuid') | list }}"
+
+    - name: Check if LUNs are mapped
+      debug:
+        msg: "No LUNs mapped to the specified igroup."
+      when: lun_name_details | length == 0
+
+    - name: Print details
+      debug:
+        msg:
+          - "lun name: {{ lun_name_details }}"
+          - "lun uuid: {{ lun_uuid_details }}"
+          - "igroup name: {{ igroup_name_details }}"
+          - "igroup uuid: {{ igroup_uuid_details }}"
+      when: lun_name_details | length > 0
+
+    - name: Extract LUN mapping UUIDs
+      set_fact:
+        lun_mapping_uuids: "{{ filtered_luns | map(attribute='lun.uuid') | list }}"
+
+    - name: Unmap LUN
+      netapp.ontap.na_ontap_lun_map:
+        state: absent
+        initiator_group_name: "{{igroup_name_details}}"
+        path: "{{ lun_name_details }}"
+        vserver: "svm1_cluste1"
+        hostname: "cluster1.demo.netapp.com"
+        username: admin
+        password: Netapp1!
+        https: yes
+        validate_certs: no
+  
