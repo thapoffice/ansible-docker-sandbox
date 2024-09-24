@@ -51,7 +51,7 @@
     - name: Check if LUNs are mapped
       debug:
         msg: "No LUNs mapped to the specified igroup."
-      when: lun_name | length == 0
+      when: lun_detail | length == 0
 
     - name: Print details of LUNs to be unmapped
       debug:
@@ -59,7 +59,7 @@
           - "lun name: {{ lun_detail }}"
           - "igroup name: {{ igroup_detail }}"
           - "svm name: {{ svm_detail }}"
-      when: lun_name | length > 0
+      when: lun_detail | length > 0
 
     - name: Unmap all LUNs
       netapp.ontap.na_ontap_lun_map:
