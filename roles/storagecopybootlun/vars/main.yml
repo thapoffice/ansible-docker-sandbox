@@ -1,0 +1,8 @@
+# variables go to here
+hostname: cluster1.demo.netapp.com
+username: admin
+password: Netapp1!
+vserver: "{{ customerPhysicalServer.luns[0].storageVolume.svm.netappAlias }}"
+OSImage_vserver: "{{ sourceBootLUN.storageVolume.svm.netappAlias}}"
+source_path: "{{ '/vol/' + sourceBootLUN.storageVolume.netappAlias + '/.snapshot/' + sourceBootStorageVolumeSnapshot + '/' + sourceBootLUN.netappAlias }}"
+dest_path: "{{ '/vol/' + customerPhysicalServer.luns[0].storageVolume.netappAlias + '/' + customerPhysicalServer.luns[0].netappAlias }}"
