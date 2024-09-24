@@ -44,10 +44,10 @@
     
     - name: Extract LUN details
       set_fact:
-        lun_name_details: "{{ filtered_luns | map(attribute='lun.name') | list }}"
-        lun_uuid_details: "{{ filtered_luns | map(attribute='lun.uuid') | list }}"
-        igroup_name_details: "{{ filtered_luns | map(attribute='igroup.name') | list }}"
-        igroup_uuid_details: "{{ filtered_luns | map(attribute='igroup.uuid') | list }}"
+        lun_name_details: "{{ filtered_luns | map(attribute='lun.name') }}"
+        lun_uuid_details: "{{ filtered_luns | map(attribute='lun.uuid') }}"
+        igroup_name_details: "{{ filtered_luns | map(attribute='igroup.name') }}"
+        igroup_uuid_details: "{{ filtered_luns | map(attribute='igroup.uuid') }}"
 
     - name: Check if LUNs are mapped
       debug:
