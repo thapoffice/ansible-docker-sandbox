@@ -56,9 +56,9 @@
     - name: Print details of LUNs to be unmapped
       debug:
         msg:
-          - "lun name: {{ lun_name }}"
-          - "igroup name: {{ igroup_name }}"
-          - "svm name: {{ svm_name }}"
+          - "lun name: {{ lun_detail }}"
+          - "igroup name: {{ igroup_detail }}"
+          - "svm name: {{ svm_detail }}"
       when: lun_name | length > 0
 
     - name: Unmap all LUNs
