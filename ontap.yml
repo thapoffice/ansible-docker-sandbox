@@ -44,10 +44,10 @@
     
     - name: Extract LUN details
       set_fact:
-        lun_name_details: "{{ filtered_luns | map(attribute='lun.name') }}"
-        lun_uuid_details: "{{ filtered_luns | map(attribute='lun.uuid') }}"
-        igroup_name_details: "{{ filtered_luns | map(attribute='igroup.name') }}"
-        igroup_uuid_details: "{{ filtered_luns | map(attribute='igroup.uuid') }}"
+        lun_name_details: "{{ filtered_luns | map(attribute='lun.name') | list}}"
+        lun_uuid_details: "{{ filtered_luns | map(attribute='lun.uuid') | list}}"
+        igroup_name_details: "{{ filtered_luns | map(attribute='igroup.name') |  list }}"
+        igroup_uuid_details: "{{ filtered_luns | map(attribute='igroup.uuid') | list }}"
 
     - name: Check if LUNs are mapped
       debug:
@@ -57,10 +57,10 @@
     - name: Print details
       debug:
         msg:
-          - "lun name: {{ lun_name_details }}"
-          - "lun uuid: {{ lun_uuid_details }}"
-          - "igroup name: {{ igroup_name_details }}"
-          - "igroup uuid: {{ igroup_uuid_details }}"
+          - "lun name: {{ lun_name_details | first}}"
+          - "lun uuid: {{ lun_uuid_details | first }}"
+          - "igroup name: {{ igroup_name_details| first }}"
+          - "igroup uuid: {{ igroup_uuid_details | first }}"
       when: lun_name_details | length > 0
 
     - name: Extract LUN mapping UUIDs
