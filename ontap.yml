@@ -70,15 +70,18 @@
     - name: Unmap all LUNs
       netapp.ontap.na_ontap_lun_map:
         state: absent
-        initiator_group_name: "{{ item.igroup }}"
-        path: "{{ item.lun }}"
+        initiator_group_name: "{{ igroup_name }}"
+        path: "{{ lun_name }}"
         vserver: "svm1_cluster1"
         hostname: "cluster1.demo.netapp.com"
         username: admin
         password: Netapp1!
         https: yes
         validate_certs: no
-      loop: "{{ query('zip', lun_name_details, igroup_name_details) | map('combine', {'lun': 0, 'igroup': 1}) | list }}"
+      loop: "{{ range(0, lun_name_details | length) | list }}"
       loop_control:
-        label: "{{ item.lun }}"
+        label: "{{ lun_name_details[item] }}"
+      vars:
+        lun_name: "{{ lun_name_details[item] }}"
+        igroup_name: "{{ igroup_name_details[item] }}"
   
