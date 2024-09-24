@@ -36,8 +36,8 @@
 
     - name: Filter LUNs for specified igroup
       set_fact:
-        filtered_luns: "{{ output.ontap_info.'[protocols/san/lun-maps]'.records | selectattr('igroup.name', 'equalto', 'ig_' + server | replace('-', '_')) | list }}"
-
+        filtered_luns: "{{ output.ontap_info['protocols/san/lun-maps'].records | selectattr('igroup.name', 'equalto', 'ig_' + server | replace('-', '_')) | list }}"
+    
     - name: Print filtered LUNs
       debug:
         msg: "{{ filtered_luns }}"
