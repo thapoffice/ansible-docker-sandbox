@@ -70,7 +70,7 @@
     - name: Unmap LUN
       netapp.ontap.na_ontap_lun_map:
         state: absent
-        initiator_group_name: "{{igroup_name_details}}"
+        initiator_group_name: "{{igroup_name_details }}"
         path: "{{ lun_name_details }}"
         vserver: "svm1_cluste1"
         hostname: "cluster1.demo.netapp.com"
@@ -78,4 +78,7 @@
         password: Netapp1!
         https: yes
         validate_certs: no
+      loop: "{{ filtered_luns | map(attribute='igroup.name', attribute='lun.name') | list }}"
+      loop_control:
+        label: "{{ item.lun_name }}"
   
