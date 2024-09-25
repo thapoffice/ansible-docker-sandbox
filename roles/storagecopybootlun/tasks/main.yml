@@ -47,7 +47,7 @@
 
 - name: Filter LUNs for specified igroup
   set_fact:
-    filtered_lun: "{{ output.lunsinfo.records | selectattr('name', 'equalto', {{ dest_path }}  | list }}"
+    filtered_lun: "{{ output.lunsinfo.records | selectattr('name', 'equalto', dest_path) | list }}"
 
 - name: Extract LUN serial
   netapp.ontap.na_ontap_rest_info:
