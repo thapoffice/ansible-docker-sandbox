@@ -4,5 +4,5 @@ username: admin
 password: Netapp1!
 vserver: svm1_cluster1
 OSImage_vserver: svm2_cluster1
-source_path: /vol/HITESH_e14219355/vol_tst_stf_cls000_tst999_s200_os_regtest_bc64555f_13d2_49cb_83b5_251e14219355
+source_path:  /vol/hitesh_01/lun01
 dest_path: /vol/GETMYLUNSERIAL/LUN001
