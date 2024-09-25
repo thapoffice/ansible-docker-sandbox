@@ -1,0 +1,91 @@
+- name: Create SVM Peer Relationship
+  netapp.ontap.na_ontap_vserver_peer:
+    state: present
+    peer_vserver: "{{ OSImage_vserver }}"
+    applications: lun_copy
+    vserver: "{{ vserver }}"
+    hostname: "{{ hostname }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    https: yes
+    validate_certs: no
+  when: OSImage_vserver != vserver
+
+- name: Copy Boot LUN
+  netapp.ontap.na_ontap_lun_copy:
+    source_vserver: "{{ OSImage_vserver }}"
+    source_path: "{{ source_path }}"
+    destination_vserver: "{{vserver}}"
+    destination_path: "{{ dest_path }}"
+    use_rest: "always"
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    https: yes
+    validate_certs: no
+
+- name: Wait for copy to complete
+  pause:
+    seconds: 60
+
+# Extract LUN serial numbers
+- name: Extract LUNs
+  netapp.ontap.na_ontap_rest_info:
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    https: yes
+    validate_certs: no
+    gather_subset:
+      - storage/luns
+  register: lunsinfo
+  delegate_to: localhost
+
+- name: Get LUN details
+  debug:
+    vars: lunsinfo
+
+- name: Filter LUNs for specified igroup
+  set_fact:
+    filtered_lun: "{{ output.lunsinfo.records | selectattr('name', 'equalto', {{ dest_path }}  | list }}"
+
+- name: Extract LUN serial
+  netapp.ontap.na_ontap_rest_info:
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    https: yes
+    validate_certs: no
+    gather_subset:
+      - storage/luns/{{ filtered_lun}}
+  register: lundetails
+  delegate_to: localhost
+
+- name: Debug lun details
+  debug:
+    vars: lundetails
+
+## Extract log entries from returned xml
+#- name: Extract log entries from returned xml
+#  xml:
+#    xmlstring: "{{lunSerial['msg']}}"
+#    xpath: /x:results/x:cli-output
+#    content: text
+#    namespaces:
+#      x: http://www.netapp.com/filer/admin
+#  register: auditEntries
+#  delegate_to: localhost
+#
+#- name: Default the output
+#  set_fact:
+#    serial: []
+#
+## Get the output ready to be returned to Airflow
+#- name: Build output
+#  set_fact:
+#    serial: "{{ serial | default([]) + [{'storage_volume_name': customerPhysicalServer.luns[0]['storageVolume']['name'] ,'netapp_alias': auditEntries.matches[0]['{http://www.netapp.com/filer/admin}cli-output'].split('\n')[2].split(' ')[1].split('/')[3],'serial_number': auditEntries.matches[0]['{http://www.netapp.com/filer/admin}cli-output'].split('\n')[2].split(' ')[2],'wwid': '600a0980' + auditEntries.matches[0]['{http://www.netapp.com/filer/admin}cli-output'].split('\n')[2].split(' ')[2],'lun_name': customerPhysicalServer.luns[0].name } ] }}"
+#
+## Return the output to Airflow
+#- name: AIRFLOW_RETURN
+#  set_fact:
+#    storage_luns: "{{ serial }}"

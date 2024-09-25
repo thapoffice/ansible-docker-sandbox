@@ -32,7 +32,7 @@
         username: admin
         password: Netapp1!
         gather_subset:
-          - storage/storage_luns_info
+          - storage/luns
         https: true
         validate_certs: false
       register: outlun_info
