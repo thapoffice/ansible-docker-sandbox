@@ -57,7 +57,7 @@
     https: yes
     validate_certs: no
     gather_subset:
-      - storage/luns/{{ filtered_lun}}
+      - storage/luns/18431397-2cb0-439a-82bc-7b09a124e4f6
   register: lundetails
   delegate_to: localhost
 
