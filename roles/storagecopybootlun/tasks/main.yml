@@ -73,6 +73,15 @@
   debug:
     var: lundetails
 
+- name: Filter LUN serial number
+  set_fact:
+    lun_serial_decimal: "{{ lundetails.json.serial_number }}"
+
+- name: Debug serial
+  debug:
+    var: lun_serial_decimal
+
+#- name: Convert Lun serial from decimal to hexadecimal
 ## Extract log entries from returned xml
 #- name: Extract log entries from returned xml
 #  xml:
