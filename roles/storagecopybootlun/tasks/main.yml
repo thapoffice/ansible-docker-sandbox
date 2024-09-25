@@ -43,7 +43,7 @@
 
 - name: Get LUN details
   debug:
-    vars: lunsinfo
+    var: lunsinfo
 
 - name: Filter LUNs for specified igroup
   set_fact:
@@ -63,7 +63,7 @@
 
 - name: Debug lun details
   debug:
-    vars: lundetails
+    var: lundetails
 
 ## Extract log entries from returned xml
 #- name: Extract log entries from returned xml
