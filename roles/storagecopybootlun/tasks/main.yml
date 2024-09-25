@@ -57,7 +57,6 @@
     force_basic_auth: yes
     user: "{{ username }}"
     password: "{{ password }}"
-  register: lun_attributes
     validate_certs: false
   register: lundetails
   delegate_to: localhost
