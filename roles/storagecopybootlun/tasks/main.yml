@@ -49,9 +49,9 @@
   set_fact:
     filtered_lun: "{{ lunsinfo.ontap_info['storage/luns'].records | selectattr('name', 'equalto', dest_path) | list }}"
 
-- name: Extract LUN and iGroup details
+- name: Filter LUN uuid from lun details
   set_fact:
-    lun_uuid: "{{ filtered_lun | map(attribute='uuid') | frist }}"
+    lun_uuid: "{{ filtered_lun | map(attribute='uuid') | first }}"
 
 - name: Debug lun uuid
   debug:
