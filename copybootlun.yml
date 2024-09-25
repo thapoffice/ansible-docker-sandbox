@@ -1,5 +1,5 @@
 ---
 - name: Copy Boot LUN role
-  
+  hosts: localhost
   roles:
     - role: storagecopybootlun
