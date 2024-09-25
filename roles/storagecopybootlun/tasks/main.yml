@@ -49,9 +49,17 @@
   set_fact:
     filtered_lun: "{{ lunsinfo.ontap_info['storage/luns'].records | selectattr('name', 'equalto', dest_path) | list }}"
 
+- name: Extract LUN and iGroup details
+  set_fact:
+    lun_uuid: "{{ filtered_lun | map(attribute='uuid') }}"
+
+- name: Debug lun uuid
+  debug:
+    var: lun_uuid
+
 - name: Extract LUN serial
   ansible.builtin.uri:
-    url: "https://{{ hostname }}/api/storage/luns/18431397-2cb0-439a-82bc-7b09a124e4f6"
+    url: "https://{{ hostname }}/api/storage/luns/{{ lun_uuid }}"
     method: 'GET'
     return_content: true
     force_basic_auth: yes
