@@ -51,7 +51,7 @@
 
 - name: Extract LUN and iGroup details
   set_fact:
-    lun_uuid: "{{ filtered_lun | map(attribute='uuid') }}"
+    lun_uuid: "{{ filtered_lun | map(attribute='uuid') | frist }}"
 
 - name: Debug lun uuid
   debug:
