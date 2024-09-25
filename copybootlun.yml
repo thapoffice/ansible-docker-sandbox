@@ -1,7 +1,5 @@
 ---
 - name: Copy Boot LUN role
-  hosts: all
-  gather_facts: no
   
   roles:
     - role: storagecopybootlun
