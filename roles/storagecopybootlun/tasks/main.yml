@@ -94,6 +94,7 @@
   debug:
     var: lun_serial_hex_clean
 
+# COMMADN TO CONVERT SERIAL echo -n 'wOj4W]Uh4EZE' | od -A n -t x1 | tr -d ' \n' 
 ## Extract log entries from returned xml
 #- name: Extract log entries from returned xml
 #  xml:
