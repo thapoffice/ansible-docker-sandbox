@@ -50,14 +50,15 @@
     filtered_lun: "{{ lunsinfo.ontap_info['storage/luns'].records | selectattr('name', 'equalto', dest_path) | list }}"
 
 - name: Extract LUN serial
-  netapp.ontap.na_ontap_rest_info:
-    hostname: "{{hostname}}"
-    username: "{{username}}"
-    password: "{{password}}"
-    https: yes
-    validate_certs: no
-    gather_subset:
-      - storage/luns/18431397-2cb0-439a-82bc-7b09a124e4f6
+  ansible.builtin.uri:
+    url: "https://{{ hostname }}/api/storage/luns/18431397-2cb0-439a-82bc-7b09a124e4f6"
+    method: 'GET'
+    return_content: true
+    force_basic_auth: yes
+    user: "{{ username }}"
+    password: "{{ password }}"
+  register: lun_attributes
+    validate_certs: false
   register: lundetails
   delegate_to: localhost
 
