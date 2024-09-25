@@ -81,7 +81,19 @@
   debug:
     var: lun_serial_decimal
 
-#- name: Convert Lun serial from decimal to hexadecimal
+# Convert the LUN serial number from ASCII to hexadecimal (like `od -A n -t x1`)
+- name: Convert serial number to hexadecimal
+  set_fact:
+    lun_serial_hex: "{{ lun_serial_decimal | to_uuid | b64encode | join('') }}"
+
+- name: Remove spaces and newline characters from the serial hex string (like `tr -d ' \n'`)
+  set_fact:
+    lun_serial_hex_clean: "{{ lun_serial_hex | replace(' ', '') | replace('\n', '') }}"
+
+- name: Debug clean LUN serial in hexadecimal
+  debug:
+    var: lun_serial_hex_clean
+
 ## Extract log entries from returned xml
 #- name: Extract log entries from returned xml
 #  xml:
