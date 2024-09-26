@@ -1,0 +1,66 @@
+---
+- hosts: localhost
+  gather_facts: false
+  name: Connectivity Test & Display ONTAP Info
+  tasks:
+    - name: "Collect ONTAP info"
+      netapp.ontap.na_ontap_rest_info:
+        hostname: cluster1.demo.netapp.com
+        username: admin
+        password: Netapp1!
+        https: true
+        validate_certs: false
+        gather_subset: "svm/svms"
+        owning_resource:
+          svm_name: "*"
+      register: info
+
+    - name: List mapped LUNs using rest-cli modules
+      netapp.ontap.na_ontap_rest_info:
+        hostname: cluster1.demo.netapp.com
+        username: admin
+        password: Netapp1!
+        gather_subset:
+          - protocols/san/lun-maps
+        https: true
+        validate_certs: false
+      register: output
+
+    - name: GET LUN SERIALS
+      netapp.ontap.na_ontap_rest_info:
+        hostname: cluster1.demo.netapp.com
+        username: admin
+        password: Netapp1!
+        gather_subset:
+          - storage/luns
+        https: true
+        validate_certs: false
+      register: outlun_info
+
+    - name: GET CERTIFICATION INFORMATION
+      netapp.ontap.na_ontap_rest_info:
+        hostname: cluster1.demo.netapp.com
+        username: admin
+        password: Netapp1!
+        gather_subset:
+          - security/certificates
+        https: true
+        validate_certs: false
+      register: outlun_info
+
+    - name: Print ONTAP Response
+      debug:
+        msg: "{{ outlun_info }}"
+
+    - name: Print ONTAP Response
+      debug:
+        msg: "{{ info }}"
+
+    - name: Print LUN Mappings Response
+      debug:
+        msg: "{{ output }}"
+
+    - name: Print LUN Mappings Response
+      debug:
+        msg: "{{ cert_info }}"
+  
