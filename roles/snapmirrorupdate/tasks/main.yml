@@ -27,5 +27,4 @@
     validate_certs: false
 #  environment:
 #    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
-#  when: "'sles15spx' not in osCode"
-#  with_items: "{{ osCode }}"
+  with_items: "{{ osCode }}"
