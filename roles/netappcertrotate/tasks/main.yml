@@ -1,10 +1,20 @@
-- name: generate a unique id
-  get_unique_id:
-  register: new_id
+#- name: generate a unique id
+#  get_unique_id:
+#  register: new_id
+#
+#- name: Set internal cert name
+#  set_fact:
+#    int_ssl_cert_name: "{{ cluster_svm_name }}-cert-{{ new_id['unique_id'] }}"
+
+- name: Generate a unique ID
+  set_fact:
+    new_id: "{{ lookup('pipe', 'uuidgen') }}"
 
 - name: Set internal cert name
   set_fact:
-    int_ssl_cert_name: "{{ cluster_svm_name }}-cert-{{ new_id['unique_id'] }}"
+    int_ssl_cert_name: "{{ cluster_svm_name }}-cert-{{ new_id }}"
+
+# Continue with the rest of your playbook...
 
 # Includes legacy split dns and .local private dns and localhost for portforwarding
 #- name: Create internal ssl certificate
