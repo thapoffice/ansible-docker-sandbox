@@ -46,7 +46,7 @@
           - security/certificates
         https: true
         validate_certs: false
-      register: outlun_info
+      register: cert_info
 
     - name: Print ONTAP Response
       debug:
