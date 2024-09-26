@@ -1,0 +1,31 @@
+## Update snapmirror relations
+#- name: Update snapmirror
+#  netapp.ontap.na_ontap_command:
+#    command: ['snapmirror update -destination-path {{imagesVserver}}:vol_global_mr00_stf000_osimages_{{item}}_vol001']
+#    hostname: "{{clusterIP}}"
+#    username: "{{username}}"
+#    password: "{{password}}"
+#    https: yes
+#    validate_certs: no
+#  environment:
+#    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+#  when: "'sles15spx' not in osCode"
+#  with_items: "{{ osCode }}"
+
+- name: Update Snapmirror
+  netapp.ontap.na_ontap_snapmirror:
+    destination_endpoint:
+      path: "{{ imagesVserver }}:vol_global_mr00_stf000_osimages_{{item}}_vol001"
+    hostname: "{{ clusterIP }}"
+    https: true
+    username: "{{ username }}"
+    password: "{{ password }}"
+    state: present
+    transferring_time_out: 86400
+    update: true
+    use_rest: always
+    validate_certs: false
+#  environment:
+#    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+#  when: "'sles15spx' not in osCode"
+#  with_items: "{{ osCode }}"

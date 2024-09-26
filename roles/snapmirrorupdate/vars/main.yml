@@ -1,0 +1,16 @@
+clusterName: "{{name}}"
+clusterIP: cluster1.demo.netapp.com
+username: admin
+password: NetApp1!
+imagesVserver: svm1_cluster1
+osCode:
+  - esx6x
+  - oel7x
+  - ovm34x
+  - rhel7x
+  - rhel8x
+  - sles15spx
+  - w2k16std
+  - w2k19std
+  - sles15spxsap
+  - lambsles15spxsap
