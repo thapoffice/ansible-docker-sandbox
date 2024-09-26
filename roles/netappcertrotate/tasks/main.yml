@@ -5,6 +5,14 @@
 #- name: Set internal cert name
 #  set_fact:
 #    int_ssl_cert_name: "{{ cluster_svm_name }}-cert-{{ new_id['unique_id'] }}"
+- name: Ensure required Ansible collections are installed
+  hosts: localhost
+  tasks:
+    - name: Install required collections
+      ansible.builtin.command: ansible-galaxy collection install community.crypto
+      changed_when: false
+
+    # Other tasks go here
 
 - name: Generate a unique ID
   set_fact:
