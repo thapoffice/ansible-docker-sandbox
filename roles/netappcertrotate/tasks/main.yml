@@ -1,0 +1,172 @@
+- name: generate a unique id
+  get_unique_id:
+  register: new_id
+
+- name: Set internal cert name
+  set_fact:
+    int_ssl_cert_name: "{{ cluster_svm_name }}-cert-{{ new_id['unique_id'] }}"
+
+# Includes legacy split dns and .local private dns and localhost for portforwarding
+#- name: Create internal ssl certificate
+#  gcp_private_cert:
+#    action: create
+#    project: "{{ ca_project }}"
+#    name: "{{ int_ssl_cert_name }}"
+#    request_data:
+#      dns_san: "{{ dns_san }}"
+#      ip_san: "{{ ip_san }}"
+#      subject:
+#        CN: "{{ common_name }}"
+#    issuer_location: "{{ ca_issuer_location }}"
+#    issuer_pool: "{{ ca_issuer_pool }}"
+#  register: ssl_certificate
+#
+#- name: debug cert creation output
+#  debug:
+#    var: ssl_certificate
+#    verbosity: 1
+
+- name: Generate private key
+  ansible.builtin.openssl_privatekey:
+    path: "/etc/ssl/private/{{ int_ssl_cert_name }}.key"
+    size: 2048
+    type: RSA
+  register: private_key
+
+- name: Create Certificate Signing Request (CSR)
+  ansible.builtin.openssl_csr:
+    path: "/etc/ssl/csr/{{ int_ssl_cert_name }}.csr"
+    privatekey_path: "/etc/ssl/private/{{ int_ssl_cert_name }}.key"
+    common_name: "{{ common_name }}"
+    subject_alt_name:
+      - DNS: "{{ dns_san }}"
+      - IP: "{{ ip_san }}"
+  register: csr
+
+- name: Sign the SSL certificate
+  ansible.builtin.openssl_certificate:
+    path: "/etc/ssl/certs/{{ int_ssl_cert_name }}.crt"
+    csr_path: "/etc/ssl/csr/{{ int_ssl_cert_name }}.csr"
+    privatekey_path: "/etc/ssl/private/{{ int_ssl_cert_name }}.key"
+    provider: selfsigned
+    days: 365
+    subject: "/CN={{ common_name }}"
+  register: ssl_certificate
+
+- name: Debug certificate creation results
+  debug:
+    var: ssl_certificate
+
+- name: Get serial number
+  set_fact:
+    new_cert_serial: "{{ ( ssl_certificate.data.certificateDescription.subjectDescription.hexSerialNumber | upper ).zfill(38) }}"
+    ca_issuer: "{{ ssl_certificate.data.issuerCertificateAuthority | basename }}"
+
+- name: install certificate on netapp
+  netapp.ontap.na_ontap_security_certificates:
+    common_name: "{{ common_name }}"
+    name: "{{ common_name }}_{{ new_cert_serial }}"
+    public_certificate: "{{ ssl_certificate.data.pemCertificate }}"
+    private_key: "{{ ssl_certificate.data.private_key }}"
+    intermediate_certificates: "{{ ssl_certificate.data.pemCertificateChain }}"
+    type: server
+    #svm: "{{ cluster_svm_name }}"
+    hostname: "{{ hostname }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    https: true
+    validate_certs: false
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+  delegate_to: localhost
+
+### Extract the currently used serial
+- name: Extract SSL config
+  netapp.ontap.na_ontap_command:
+    command: ['ssl show -vserver {{ cluster_svm_name }} -fields serial']
+    privilege: 'advanced'
+    hostname: "{{ hostname }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    https: true
+    validate_certs: no
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+  delegate_to: localhost
+  register: command_output
+
+# Extract entries from returned xml
+- name: Extract entries from returned xml
+  xml:
+    xmlstring: "{{command_output['msg']}}"
+    xpath: /x:results/x:cli-output
+    content: text
+    namespaces:
+      x: http://www.netapp.com/filer/admin
+  register: command_output_parsed
+  delegate_to: localhost  
+
+- name: debug output
+  debug:
+    var: command_output_parsed
+    verbosity: 1
+
+- name: Store the serial number of the currently used cert
+  set_fact:
+    used_serial: "{{command_output_parsed.matches[0]['{http://www.netapp.com/filer/admin}cli-output'].split('\n')[4].split(' ')[1]}}"
+
+- name: Debug serial
+  debug:
+    var: used_serial
+    verbosity: 1
+
+- name: Modify SSL Security Config to set supported protocols and ciphers
+  netapp.ontap.na_ontap_security_config:
+    name: ssl
+    is_fips_enabled: "{{ fips_enabled }}"
+    supported_ciphers:  "{{ supported_ciphers }}"
+    supported_protocols: "{{ supported_protocols }}"
+    hostname: "{{ hostname }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    https: true
+    validate_certs: false
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+  delegate_to: localhost
+  when: apply_strong_crypto
+
+- name: Modify SSL config to use the new certificate
+  netapp.ontap.na_ontap_command:
+    command: ['security ssl modify -server-enabled true -vserver {{ cluster_svm_name }} -serial {{ new_cert_serial }} -ca {{ ca_issuer }}']
+    privilege: 'advanced'
+    hostname: "{{ hostname }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    https: true
+    validate_certs: no
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+  delegate_to: localhost
+
+- name: Delete old certificate
+  netapp.ontap.na_ontap_command:
+    command: ['security certificate delete -vserver {{ cluster_svm_name }} -serial {{ used_serial }} -ca *']
+    privilege: 'advanced'
+    hostname: "{{ hostname }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    https: true
+    validate_certs: no
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+  delegate_to: localhost
+
+- name: Get TLS settings from an nmap scan
+  shell: nmap --script ssl-enum-ciphers -p 443 {{ ansible_host }}
+  register: nmap_output
+  delegate_to: localhost
+
+- name: Output TLS settings
+  debug:
+    var: nmap_output['stdout_lines']
