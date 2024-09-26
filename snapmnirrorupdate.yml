@@ -1,0 +1,4 @@
+- name: Update an existing snapmirror relation
+  hosts: localhost
+  roles:
+    - role: snapmirrorupdate

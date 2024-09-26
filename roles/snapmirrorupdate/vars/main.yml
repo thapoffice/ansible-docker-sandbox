@@ -6,10 +6,10 @@ imagesVserver: svm_cluster1_osimages
 osCode:
   - esx6x
   - oel7x
-  - ovm34x
-  - rhel7x
-  - rhel8x
-  - w2k16std
-  - w2k19std
-  - sles15spxsap
-  - lambsles15spxsap
+#  - ovm34x
+#  - rhel7x
+#  - rhel8x
+#  - w2k16std
+#  - w2k19std
+#  - sles15spxsap
+#  - lambsles15spxsap
