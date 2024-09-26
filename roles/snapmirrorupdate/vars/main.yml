@@ -3,6 +3,7 @@ clusterIP: cluster1.demo.netapp.com
 username: admin
 password: NetApp1!
 imagesVserver: svm_cluster1_osimages
+src_imagesVserver: svm2_cluster1_osimages
 osCode:
   - esx6x
   - oel7x

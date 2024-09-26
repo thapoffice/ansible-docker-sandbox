@@ -14,8 +14,10 @@
 
 - name: Update Snapmirror
   netapp.ontap.na_ontap_snapmirror:
+    source_endpoint:
+      path: "{{ src_imagesVserver }}:vol_global_mr00_stf000_osimages_{{ item }}_vol001"
     destination_endpoint:
-      path: "{{ imagesVserver }}:vol_global_mr00_stf000_osimages_{{item}}_vol001"
+      path: "{{ imagesVserver }}:vol_global_mr00_stf000_osimages_{{ item }}_vol001"
     hostname: "{{ clusterIP }}"
     https: true
     username: "{{ username }}"
