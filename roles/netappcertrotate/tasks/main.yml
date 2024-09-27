@@ -28,9 +28,9 @@
 
 - name: Create self-signed certificate
   community.crypto.x509_certificate:
-    path: "/tmp/cluster1-cert-6f6a9e39-2ccf-4e75-a289-70b79e5d83a7.crt"
-    csr_path: "/tmp/cluster1-cert-6f6a9e39-2ccf-4e75-a289-70b79e5d83a7.csr"
-    privatekey_path: "/tmp/cluster1-cert-6f6a9e39-2ccf-4e75-a289-70b79e5d83a7.key"
+    path: "/tmp/{{ int_ssl_cert_name }}.crt"
+    csr_path: "/tmp/{{ int_ssl_cert_name }}.csr"
+    privatekey_path: "/tmp/{{ int_ssl_cert_name }}.key"
     provider: "selfsigned"
     state: "present"
     force: false
