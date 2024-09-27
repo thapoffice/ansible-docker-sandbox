@@ -47,7 +47,7 @@
   netapp.ontap.na_ontap_security_certificates:
     common_name: "{{ common_name }}"
     name: "{{ common_name }}_{{ new_cert_serial }}"
-    public_certificate: "{{ ssl_certificate.filename }}"
+    public_certificate: "{{ lookup('file', ssl_certificate.filename) }}"
     private_key: "{{ lookup('file', ssl_certificate.privatekey) }}"
     intermediate_certificates: []
     type: server
