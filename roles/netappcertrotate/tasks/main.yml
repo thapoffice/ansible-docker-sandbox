@@ -8,15 +8,15 @@
 
 - name: Generate private key
   community.crypto.openssl_privatekey:
-    path: "/etc/ssl/private/{{ int_ssl_cert_name }}.key"
+    path: "/etc/ssl/{{ int_ssl_cert_name }}.key"
     size: 2048
     type: RSA
   register: private_key
 
 - name: Create Certificate Signing Request (CSR)
   community.crypto.openssl_csr:
-    path: "/etc/ssl/csr/{{ int_ssl_cert_name }}.csr"
-    privatekey_path: "/etc/ssl/private/{{ int_ssl_cert_name }}.key"
+    path: "/etc/ssl/{{ int_ssl_cert_name }}.csr"
+    privatekey_path: "/etc/ssl/{{ int_ssl_cert_name }}.key"
     common_name: "{{ common_name }}"
     subject_alt_name:
       - DNS: "{{ dns_san }}"
@@ -25,9 +25,9 @@
 
 - name: Sign the SSL certificate
   community.crypto.x509_certificate:
-    path: "/etc/ssl/certs/{{ int_ssl_cert_name }}.crt"
-    csr_path: "/etc/ssl/csr/{{ int_ssl_cert_name }}.csr"
-    privatekey_path: "/etc/ssl/private/{{ int_ssl_cert_name }}.key"
+    path: "/etc/ssl/{{ int_ssl_cert_name }}.crt"
+    csr_path: "/etc/ssl/{{ int_ssl_cert_name }}.csr"
+    privatekey_path: "/etc/ssl/{{ int_ssl_cert_name }}.key"
     provider: selfsigned
     days: 365
     subject: "/CN={{ common_name }}"
