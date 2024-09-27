@@ -39,6 +39,7 @@
     # Remove unsupported parameters
     # subject: "/CN=cluster1.demo.netapp.com"
     # days: 365
+  register: ssl_certificate
 
 - name: Get serial number
   set_fact:
