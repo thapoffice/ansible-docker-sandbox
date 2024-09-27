@@ -89,7 +89,7 @@
     username: "{{username}}"
     password: "{{password}}"
     verb: 'GET'
-    command: security/certificates
+    command: 'security/certificates'
     params: 
       vserver: cluster1
       common-name: cluste1.demo.netapp.com
