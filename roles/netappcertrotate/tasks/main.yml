@@ -40,7 +40,7 @@
 
 - name: Get serial number
   set_fact:
-    new_cert_serial: "{{ ssl_certificate.serial_number | string | upper }}"
+    new_cert_serial: "{{ (ssl_certificate.serial_number | string | upper ) [:40] }}"
     ca_issuer: "{{ ssl_certificate.diff.after.issuer.commonName }}"
 
 - name: Install certificate on NetApp
