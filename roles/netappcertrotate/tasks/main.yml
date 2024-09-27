@@ -89,9 +89,9 @@
     username: "{{username}}"
     password: "{{password}}"
     verb: 'PATCH'
-    command: 'security/login/motd'
-    params: {'vserver': 'cluster1'}
-    body: {'message': 'test shit not working only works for netapp shit'}
+    command: 'security/login/motd/show'
+    #params: {'vserver': 'cluster1'}
+    #body: {'message': 'test shit not working only works for netapp shit'}
     #params: 
     #  vserver: cluster1
     #  common-name: cluste1.demo.netapp.com
