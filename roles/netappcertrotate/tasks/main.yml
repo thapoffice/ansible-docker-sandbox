@@ -97,88 +97,89 @@
     validate_certs: false
   register: cli_out
 
-### Extract the currently used serial
-- name: Extract SSL config
-  netapp.ontap.na_ontap_command:
-    command: ['ssl show -vserver {{ cluster_svm_name }} -fields serial']
-    privilege: 'advanced'
-    hostname: "{{ hostname }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
-    https: true
-    validate_certs: no
-  delegate_to: localhost
-  register: command_output
-
-# Extract entries from returned xml
-- name: Extract entries from returned xml
-  xml:
-    xmlstring: "{{command_output['msg']}}"
-    xpath: /x:results/x:cli-output
-    content: text
-    namespaces:
-      x: http://www.netapp.com/filer/admin
-  register: command_output_parsed
-  delegate_to: localhost  
-
-- name: debug output
-  debug:
-    var: command_output_parsed
-    verbosity: 1
-
-- name: Store the serial number of the currently used cert
-  set_fact:
-    used_serial: "{{command_output_parsed.matches[0]['{http://www.netapp.com/filer/admin}cli-output'].split('\n')[4].split(' ')[1]}}"
-
-- name: Debug serial
-  debug:
-    var: used_serial
-    verbosity: 1
-
-- name: Modify SSL Security Config to set supported protocols and ciphers
-  netapp.ontap.na_ontap_security_config:
-    name: ssl
-    is_fips_enabled: "{{ fips_enabled }}"
-    supported_ciphers:  "{{ supported_ciphers }}"
-    supported_protocols: "{{ supported_protocols }}"
-    hostname: "{{ hostname }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
-    https: true
-    validate_certs: false
-  delegate_to: localhost
-  when: apply_strong_crypto
-
-- name: Modify SSL config to use the new certificate
-  netapp.ontap.na_ontap_command:
-    command: ['security ssl modify -server-enabled true -vserver {{ cluster_svm_name }} -serial {{ new_cert_serial }} -ca {{ ca_issuer }}']
-    privilege: 'advanced'
-    hostname: "{{ hostname }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
-    https: true
-    validate_certs: no
-  environment:
-    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
-  delegate_to: localhost
-
-- name: Delete old certificate
-  netapp.ontap.na_ontap_command:
-    command: ['security certificate delete -vserver {{ cluster_svm_name }} -serial {{ used_serial }} -ca *']
-    privilege: 'advanced'
-    hostname: "{{ hostname }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
-    https: true
-    validate_certs: no
-  environment:
-    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
-  delegate_to: localhost
-
-- name: Get TLS settings from an nmap scan
-  shell: nmap --script ssl-enum-ciphers -p 443 {{ ansible_host }}
-  register: nmap_output
-
-- name: Output TLS settings
-  debug:
-    var: nmap_output['stdout_lines']
+#### Extract the currently used serial
+#- name: Extract SSL config
+#  netapp.ontap.na_ontap_command:
+#    command: ['ssl show -vserver {{ cluster_svm_name }} -fields serial']
+#    privilege: 'advanced'
+#    hostname: "{{ hostname }}"
+#    username: "{{ username }}"
+#    password: "{{ password }}"
+#    https: true
+#    validate_certs: no
+#  delegate_to: localhost
+#  register: command_output
+#
+## Extract entries from returned xml
+#- name: Extract entries from returned xml
+#  xml:
+#    xmlstring: "{{command_output['msg']}}"
+#    xpath: /x:results/x:cli-output
+#    content: text
+#    namespaces:
+#      x: http://www.netapp.com/filer/admin
+#  register: command_output_parsed
+#  delegate_to: localhost  
+#
+#- name: debug output
+#  debug:
+#    var: command_output_parsed
+#    verbosity: 1
+#
+#- name: Store the serial number of the currently used cert
+#  set_fact:
+#    used_serial: "{{command_output_parsed.matches[0]['{http://www.netapp.com/filer/admin}cli-output'].split('\n')[4].split(' ')[1]}}"
+#
+#- name: Debug serial
+#  debug:
+#    var: used_serial
+#    verbosity: 1
+#
+#- name: Modify SSL Security Config to set supported protocols and ciphers
+#  netapp.ontap.na_ontap_security_config:
+#    name: ssl
+#    is_fips_enabled: "{{ fips_enabled }}"
+#    supported_ciphers:  "{{ supported_ciphers }}"
+#    supported_protocols: "{{ supported_protocols }}"
+#    hostname: "{{ hostname }}"
+#    username: "{{ username }}"
+#    password: "{{ password }}"
+#    https: true
+#    validate_certs: false
+#  delegate_to: localhost
+#  when: apply_strong_crypto
+#
+#- name: Modify SSL config to use the new certificate
+#  netapp.ontap.na_ontap_command:
+#    command: ['security ssl modify -server-enabled true -vserver {{ cluster_svm_name }} -serial {{ new_cert_serial }} -ca {{ ca_issuer }}']
+#    privilege: 'advanced'
+#    hostname: "{{ hostname }}"
+#    username: "{{ username }}"
+#    password: "{{ password }}"
+#    https: true
+#    validate_certs: no
+#  environment:
+#    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+#  delegate_to: localhost
+#
+#- name: Delete old certificate
+#  netapp.ontap.na_ontap_command:
+#    command: ['security certificate delete -vserver {{ cluster_svm_name }} -serial {{ used_serial }} -ca *']
+#    privilege: 'advanced'
+#    hostname: "{{ hostname }}"
+#    username: "{{ username }}"
+#    password: "{{ password }}"
+#    https: true
+#    validate_certs: no
+#  environment:
+#    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+#  delegate_to: localhost
+#
+#- name: Get TLS settings from an nmap scan
+#  shell: nmap --script ssl-enum-ciphers -p 443 {{ ansible_host }}
+#  register: nmap_output
+#
+#- name: Output TLS settings
+#  debug:
+#    var: nmap_output['stdout_lines']
+#
