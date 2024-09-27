@@ -5,10 +5,6 @@
 #- name: Set internal cert name
 #  set_fact:
 #    int_ssl_cert_name: "{{ cluster_svm_name }}-cert-{{ new_id['unique_id'] }}"
-- name: Install required collections
-  ansible.builtin.command: ansible-galaxy collection install community.crypto
-
-# Other tasks go here
 
 - name: Generate a unique ID
   set_fact:
@@ -41,7 +37,7 @@
 #    verbosity: 1
 
 - name: Generate private key
-  community.crypto.openssl_privatekey:
+  community.crypto.x509_certificate:
     path: "/etc/ssl/private/{{ int_ssl_cert_name }}.key"
     size: 2048
     type: RSA
@@ -58,7 +54,7 @@
   register: csr
 
 - name: Sign the SSL certificate
-  community.crypto.openssl_certificate:
+  community.crypto.x509_certificate:
     path: "/etc/ssl/certs/{{ int_ssl_cert_name }}.crt"
     csr_path: "/etc/ssl/csr/{{ int_ssl_cert_name }}.csr"
     privatekey_path: "/etc/ssl/private/{{ int_ssl_cert_name }}.key"
