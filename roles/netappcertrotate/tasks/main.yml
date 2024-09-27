@@ -88,7 +88,7 @@
     hostname: "{{hostname}}"
     username: "{{username}}"
     password: "{{password}}"
-    verb: 'PATCH'
+    verb: 'GET'
     command: 'security/login/motd/show'
     #params: {'vserver': 'cluster1'}
     #body: {'message': 'test shit not working only works for netapp shit'}
