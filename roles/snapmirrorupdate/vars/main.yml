@@ -1,7 +1,7 @@
 clusterName: "{{name}}"
 clusterIP: cluster1.demo.netapp.com
 username: admin
-password: NetApp1!
+password: Netapp1!
 imagesVserver: svm_cluster1_osimages
 src_imagesVserver: svm_cluster2_osimages
 osCode:
