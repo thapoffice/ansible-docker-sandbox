@@ -1,0 +1,7 @@
+clusterName: "{{name}}"
+clusterIP: 192.168.0.101
+hostname: cluster1.demo.netapp.com
+username: admin
+password: NetApp1!
+
+#alias gitready='git add .; git commit -m "crzayDay"; git push;awx -k --conf.host https://awx.demo.netapp.com --conf.username admin --conf.password Netapp1! project update 15'

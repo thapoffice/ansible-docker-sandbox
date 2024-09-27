@@ -1,8 +1,5 @@
 # netapp login settings
-clusterName: "{{name}}"
-clusterIP: cluster1.demo.netapp.com
-username: admin
-password: NetApp1!
+
 
 # TLS Settings
 supported_ciphers:  'ALL:!LOW:!aNULL:!EXP:!eNULL:!3DES:!RC4:!SHA1'
