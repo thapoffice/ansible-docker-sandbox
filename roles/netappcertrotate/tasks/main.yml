@@ -142,7 +142,6 @@
 - name: Get TLS settings from an nmap scan
   shell: nmap --script ssl-enum-ciphers -p 443 {{ ansible_host }}
   register: nmap_output
-  delegate_to: localhost
 
 - name: Output TLS settings
   debug:
