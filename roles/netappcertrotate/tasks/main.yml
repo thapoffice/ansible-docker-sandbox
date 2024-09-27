@@ -15,12 +15,15 @@
 
 - name: Create Certificate Signing Request (CSR)
   community.crypto.openssl_csr:
-    path: "/tmp/{{ int_ssl_cert_name }}.csr"
-    privatekey_path: "/tmp/{{ int_ssl_cert_name }}.key"
+    path: "/etc/ssl/csr/{{ int_ssl_cert_name }}.csr"
+    privatekey_path: "/etc/ssl/private/{{ int_ssl_cert_name }}.key"
     common_name: "{{ common_name }}"
     subject_alt_name:
-      - DNS: "{{ dns_san }}"
-      - IP: "{{ ip_san }}"
+      - "DNS:{{ common_name }}"
+      - "DNS:cluster1"
+      - "DNS:localhost"
+      - "IP:192.168.0.101"
+    digest: "sha256"
   register: csr
 
 - name: Sign the SSL certificate
