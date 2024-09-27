@@ -68,6 +68,33 @@
     validate_certs: false
   delegate_to: localhost
 
+- name: GET CERTIFICATION INFORMATION
+  netapp.ontap.na_ontap_rest_info:
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    gather_subset:
+      - security/certificates
+    https: true
+    validate_certs: false
+  register: cert_info
+
+- name: Debug cert_info
+  debug:
+    var: cert_info
+
+- name: Ontap rest-cli module for the first time
+  netapp.ontap.na_ontap_rest_cli:
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    verb: 'GET'
+    command: security/certificates
+    params: 
+      vserver: cluster1
+      common-name: cluste1.demo.netapp.com
+  register: cli_out
+
 ### Extract the currently used serial
 - name: Extract SSL config
   netapp.ontap.na_ontap_command:
