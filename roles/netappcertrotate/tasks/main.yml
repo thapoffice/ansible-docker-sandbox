@@ -39,7 +39,7 @@
 - name: Generate private key
   community.crypto.x509_certificate:
     path: "/etc/ssl/private/{{ int_ssl_cert_name }}.key"
-    provider: selfsignedprovider: selfsigned
+    provider: selfsigned
     size: 2048
     type: RSA
   register: private_key
