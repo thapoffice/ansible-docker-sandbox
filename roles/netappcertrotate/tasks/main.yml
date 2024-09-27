@@ -51,23 +51,23 @@
   set_fact:
     new_cert_serial: "{{ (ssl_certificate.serial_number | string | upper ) [:40] }}"
     ca_issuer: "{{ ssl_certificate.diff.after.issuer.commonName }}"
-
-- name: Install certificate on NetApp
-  netapp.ontap.na_ontap_security_certificates:
-    common_name: "{{ common_name }}"
-    name: "{{ common_name }}_{{ new_cert_serial }}"
-    public_certificate: "{{ lookup('file', ssl_certificate.filename) }}"
-    private_key: "{{ lookup('file', ssl_certificate.privatekey) }}"
-    intermediate_certificates: []
-    type: server
-    # svm: "{{ cluster_svm_name }}"
-    hostname: "{{hostname}}"
-    username: "{{username}}"
-    password: "{{password}}"
-    https: true
-    validate_certs: false
-  delegate_to: localhost
-
+#
+#- name: Install certificate on NetApp
+#  netapp.ontap.na_ontap_security_certificates:
+#    common_name: "{{ common_name }}"
+#    name: "{{ common_name }}_{{ new_cert_serial }}"
+#    public_certificate: "{{ lookup('file', ssl_certificate.filename) }}"
+#    private_key: "{{ lookup('file', ssl_certificate.privatekey) }}"
+#    intermediate_certificates: []
+#    type: server
+#    # svm: "{{ cluster_svm_name }}"
+#    hostname: "{{hostname}}"
+#    username: "{{username}}"
+#    password: "{{password}}"
+#    https: true
+#    validate_certs: false
+#  delegate_to: localhost
+#
 - name: GET CERTIFICATION INFORMATION
   netapp.ontap.na_ontap_rest_info:
     hostname: "{{hostname}}"
