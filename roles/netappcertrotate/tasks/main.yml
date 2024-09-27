@@ -49,7 +49,7 @@
     name: "{{ common_name }}_{{ new_cert_serial }}"
     public_certificate: "{{ ssl_certificate.filename }}"
     private_key: "{{ lookup('file', ssl_certificate.privatekey) }}"
-    intermediate_certificates: "{{ ssl_certificate.diff.after.subject_alt_name | join(', ') }}"
+    intermediate_certificates: []
     type: server
     # svm: "{{ cluster_svm_name }}"
     hostname: "{{hostname}}"
