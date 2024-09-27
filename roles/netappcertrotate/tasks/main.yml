@@ -90,9 +90,9 @@
     password: "{{password}}"
     verb: 'GET'
     command: 'security/certificates'
-    params: 
-      vserver: cluster1
-      common-name: cluste1.demo.netapp.com
+    #params: 
+    #  vserver: cluster1
+    #  common-name: cluste1.demo.netapp.com
     https: true
     validate_certs: false
   register: cli_out
