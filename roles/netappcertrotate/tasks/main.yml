@@ -1,11 +1,3 @@
-#- name: generate a unique id
-#  get_unique_id:
-#  register: new_id
-#
-#- name: Set internal cert name
-#  set_fact:
-#    int_ssl_cert_name: "{{ cluster_svm_name }}-cert-{{ new_id['unique_id'] }}"
-
 - name: Generate a unique ID
   set_fact:
     new_id: "{{ lookup('pipe', 'uuidgen') }}"
@@ -14,32 +6,9 @@
   set_fact:
     int_ssl_cert_name: "{{ cluster_svm_name }}-cert-{{ new_id }}"
 
-# Continue with the rest of your playbook...
-
-# Includes legacy split dns and .local private dns and localhost for portforwarding
-#- name: Create internal ssl certificate
-#  gcp_private_cert:
-#    action: create
-#    project: "{{ ca_project }}"
-#    name: "{{ int_ssl_cert_name }}"
-#    request_data:
-#      dns_san: "{{ dns_san }}"
-#      ip_san: "{{ ip_san }}"
-#      subject:
-#        CN: "{{ common_name }}"
-#    issuer_location: "{{ ca_issuer_location }}"
-#    issuer_pool: "{{ ca_issuer_pool }}"
-#  register: ssl_certificate
-#
-#- name: debug cert creation output
-#  debug:
-#    var: ssl_certificate
-#    verbosity: 1
-
 - name: Generate private key
-  community.crypto.x509_certificate:
+  community.crypto.openssl_privatekey:
     path: "/etc/ssl/private/{{ int_ssl_cert_name }}.key"
-    provider: selfsigned
     size: 2048
     type: RSA
   register: private_key
