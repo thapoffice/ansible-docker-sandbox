@@ -52,9 +52,9 @@
     intermediate_certificates: "{{ ssl_certificate.diff.after.subject_alt_name | join(', ') }}"
     type: server
     # svm: "{{ cluster_svm_name }}"
-    hostname: "{{ hostname }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
     https: true
     validate_certs: false
   delegate_to: localhost
