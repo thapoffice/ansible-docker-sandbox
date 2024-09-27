@@ -15,8 +15,8 @@
 
 - name: Create Certificate Signing Request (CSR)
   community.crypto.openssl_csr:
-    path: "/etc/ssl/{{ int_ssl_cert_name }}.csr"
-    privatekey_path: "/etc/ssl/{{ int_ssl_cert_name }}.key"
+    path: "/tmp/{{ int_ssl_cert_name }}.csr"
+    privatekey_path: "/tmp/{{ int_ssl_cert_name }}.key"
     common_name: "{{ common_name }}"
     subject_alt_name:
       - DNS: "{{ dns_san }}"
@@ -25,9 +25,9 @@
 
 - name: Sign the SSL certificate
   community.crypto.x509_certificate:
-    path: "/etc/ssl/{{ int_ssl_cert_name }}.crt"
-    csr_path: "/etc/ssl/{{ int_ssl_cert_name }}.csr"
-    privatekey_path: "/etc/ssl/{{ int_ssl_cert_name }}.key"
+    path: "/tmp/{{ int_ssl_cert_name }}.crt"
+    csr_path: "/tmp/{{ int_ssl_cert_name }}.csr"
+    privatekey_path: "/tmp/{{ int_ssl_cert_name }}.key"
     provider: selfsigned
     days: 365
     subject: "/CN={{ common_name }}"
