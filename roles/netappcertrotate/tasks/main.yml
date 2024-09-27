@@ -13,6 +13,9 @@
     type: RSA
   register: private_key
 
+- name: For the sake of
+  command: cat /tmp/{{ int_ssl_cert_name}}.key
+
 - name: Create Certificate Signing Request (CSR)
   community.crypto.openssl_csr:
     path: "/tmp/{{ int_ssl_cert_name }}.csr"
@@ -108,8 +111,6 @@
     password: "{{ password }}"
     https: true
     validate_certs: false
-  environment:
-    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
   delegate_to: localhost
   when: apply_strong_crypto
 
