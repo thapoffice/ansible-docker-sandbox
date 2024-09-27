@@ -93,6 +93,8 @@
     params: 
       vserver: cluster1
       common-name: cluste1.demo.netapp.com
+    https: true
+    validate_certs: false
   register: cli_out
 
 ### Extract the currently used serial
