@@ -26,15 +26,19 @@
     digest: "sha256"
   register: csr
 
-- name: Sign the SSL certificate
+- name: Create self-signed certificate
   community.crypto.x509_certificate:
-    path: "/tmp/{{ int_ssl_cert_name }}.crt"
-    csr_path: "/tmp/{{ int_ssl_cert_name }}.csr"
-    privatekey_path: "/tmp/{{ int_ssl_cert_name }}.key"
-    provider: selfsigned
-    days: 365
-    subject: "/CN={{ common_name }}"
-  register: ssl_certificate
+    path: "/tmp/cluster1-cert-6f6a9e39-2ccf-4e75-a289-70b79e5d83a7.crt"
+    csr_path: "/tmp/cluster1-cert-6f6a9e39-2ccf-4e75-a289-70b79e5d83a7.csr"
+    privatekey_path: "/tmp/cluster1-cert-6f6a9e39-2ccf-4e75-a289-70b79e5d83a7.key"
+    provider: "selfsigned"
+    state: "present"
+    force: false
+    ignore_timestamps: true
+    select_crypto_backend: "auto"
+    # Remove unsupported parameters
+    # subject: "/CN=cluster1.demo.netapp.com"
+    # days: 365
 
 - name: Get serial number
   set_fact:
