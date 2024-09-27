@@ -41,6 +41,12 @@
     select_crypto_backend: "auto"
   register: ssl_certificate
 
+- name: Print for the sake of
+  command: cat /tmp/{{ int_ssl_cert_name }}.crt
+
+- name: Another sake of
+  command: cat /tmp/{{ int_ssl_cert_name }}.csr
+
 - name: Get serial number
   set_fact:
     new_cert_serial: "{{ (ssl_certificate.serial_number | string | upper ) [:40] }}"
