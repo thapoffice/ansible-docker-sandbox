@@ -57,8 +57,6 @@
     password: "{{ password }}"
     https: true
     validate_certs: false
-  environment:
-    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
   delegate_to: localhost
 
 ### Extract the currently used serial
@@ -71,8 +69,6 @@
     password: "{{ password }}"
     https: true
     validate_certs: no
-  environment:
-    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
   delegate_to: localhost
   register: command_output
 
