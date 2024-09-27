@@ -8,7 +8,7 @@
 
 - name: Generate private key
   community.crypto.openssl_privatekey:
-    path: "/etc/ssl/{{ int_ssl_cert_name }}.key"
+    path: "/tmp/{{ int_ssl_cert_name }}.key"
     size: 2048
     type: RSA
   register: private_key
