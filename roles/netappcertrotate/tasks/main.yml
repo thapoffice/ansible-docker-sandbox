@@ -36,25 +36,22 @@
     force: false
     ignore_timestamps: true
     select_crypto_backend: "auto"
-    # Remove unsupported parameters
-    # subject: "/CN=cluster1.demo.netapp.com"
-    # days: 365
   register: ssl_certificate
 
 - name: Get serial number
   set_fact:
-    new_cert_serial: "{{ ( ssl_certificate.data.certificateDescription.subjectDescription.hexSerialNumber | upper ).zfill(38) }}"
-    ca_issuer: "{{ ssl_certificate.data.issuerCertificateAuthority | basename }}"
+    new_cert_serial: "{{ ssl_certificate.serial_number | string | upper | zfill(38) }}"
+    ca_issuer: "{{ ssl_certificate.diff.after.issuer.commonName }}"
 
-- name: install certificate on netapp
+- name: Install certificate on NetApp
   netapp.ontap.na_ontap_security_certificates:
     common_name: "{{ common_name }}"
     name: "{{ common_name }}_{{ new_cert_serial }}"
-    public_certificate: "{{ ssl_certificate.data.pemCertificate }}"
-    private_key: "{{ ssl_certificate.data.private_key }}"
-    intermediate_certificates: "{{ ssl_certificate.data.pemCertificateChain }}"
+    public_certificate: "{{ ssl_certificate.filename }}"
+    private_key: "{{ lookup('file', ssl_certificate.privatekey) }}"
+    intermediate_certificates: "{{ ssl_certificate.diff.after.subject_alt_name | join(', ') }}"
     type: server
-    #svm: "{{ cluster_svm_name }}"
+    # svm: "{{ cluster_svm_name }}"
     hostname: "{{ hostname }}"
     username: "{{ username }}"
     password: "{{ password }}"
