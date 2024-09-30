@@ -18,38 +18,21 @@
 - name: Assert that two fabrics are returned
   assert:
     that:
-      - fc_fabrics.json.records | length == 2
+      - fc_fabrics.json.records | length == 4
     fail_msg: "NetApp Cluster {{ name }} does not see two storage fabrics"
     success_msg: "NetApp Cluster {{ name }} does correctly see two storage fabrics"
 
-#- name: Get Fibre Channel Fabric Zones
-#  uri:
-#    url: "https://{{ clusterIP }}:443/api/network/fc/fabrics/{{ item.name }}/zones"
-#    method: GET
-#    return_content: yes
-#    url_username: "{{ username }}"
-#    url_password: "{{ password }}"
-#    validate_certs: false
-#  environment:
-#    no_proxy: "{{ lookup('env', 'no_proxy') + ',' + clusterIP }}"
-#  register: fc_fabrics_zones
-#  delegate_to: localhost
-#  loop: "{{ fc_fabrics.json.records }}"
-#
-#- name: Debug
-#  debug:
-#    msg: "{{ fc_fabrics_zones }}"
-
 - name: Get fcp zone show command output
-  netapp.ontap.na_ontap_command:
-    command: ["fcp zone show"]
+  netapp.ontap.na_ontap_rest_cli:
+    command: 'fcp/zone'
+    verb: 'GET'
     hostname: "{{ clusterIP }}"
     username: "{{ username }}"
     password: "{{ password }}"
     https: yes
     validate_certs: no
-  environment:
-    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+  #environment:
+    #no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
   register: fcp_zone_show_output
   ignore_errors: True
 
