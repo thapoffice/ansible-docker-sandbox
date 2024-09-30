@@ -68,7 +68,7 @@
 - name: Restore from snapshot
   netapp.ontap.na_ontap_rest_cli:
     command: 'snapshot/restore'
-    verb: 'POST'
+    verb: 'PATCH'
     params:
       vserver: svm1_cluster1 
       volume: HITESH_e14219355
