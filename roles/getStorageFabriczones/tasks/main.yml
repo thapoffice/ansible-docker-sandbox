@@ -19,8 +19,8 @@
   assert:
     that:
       - fc_fabrics.json.records | length == 4
-    fail_msg: "NetApp Cluster {{ name }} does not see two storage fabrics"
-    success_msg: "NetApp Cluster {{ name }} does correctly see two storage fabrics"
+    fail_msg: "NetApp Cluster {{ hostname }} does not see two storage fabrics"
+    success_msg: "NetApp Cluster {{ hostname }} does correctly see two storage fabrics"
 
 - name: Get fcp zone show command output
   netapp.ontap.na_ontap_rest_cli:
