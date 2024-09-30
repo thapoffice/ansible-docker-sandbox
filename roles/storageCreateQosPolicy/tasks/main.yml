@@ -25,6 +25,7 @@
     verb: 'PATCH'
     params:
       policy-group: "{{ item.name }}"
+    body:
       block-size: "{{ item.block_size }}"
       peak-iops-allocation: "{{ item.peak_iops_allocation }}"
       expected-iops-allocation: "{{ item.expected_iops_allocation }}"
