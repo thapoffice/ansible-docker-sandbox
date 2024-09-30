@@ -50,7 +50,7 @@
     hostname: "{{hostname}}"
     username: "{{username}}"
     password: "{{password}}"
-    vserver: svm_cluster1
+    vserver: svm1_cluster1
     https: yes
     validate_certs: no
   #environment:
@@ -69,7 +69,7 @@
     hostname: "{{hostname}}"
     username: "{{username}}"
     password: "{{password}}"
-    vserver: svm_cluster1
+    vserver: svm1_cluster1
     https: yes
     validate_certs: no
   #environment:
@@ -101,7 +101,7 @@
     hostname: "{{hostname}}"
     username: "{{username}}"
     password: "{{password}}"
-    vserver: svm_cluster1
+    vserver: svm1_cluster1
     https: yes
     validate_certs: no
 #  environment:
