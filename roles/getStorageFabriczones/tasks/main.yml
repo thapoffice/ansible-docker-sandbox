@@ -1,0 +1,67 @@
+- name: Get Fibre Channel Fabrics
+  uri:
+    url: "https://{{ clusterIP }}:443/api/network/fc/fabrics"
+    method: GET
+    return_content: yes
+    url_username: "{{ username }}"
+    url_password: "{{ password }}"
+    validate_certs: false
+  environment:
+    no_proxy: "{{ lookup('env', 'no_proxy') + ',' + clusterIP }}"
+  register: fc_fabrics
+  delegate_to: localhost
+
+- name: Debug
+  debug:
+    msg: "{{ fc_fabrics }}"
+
+- name: Assert that two fabrics are returned
+  assert:
+    that:
+      - fc_fabrics.json.records | length == 2
+    fail_msg: "NetApp Cluster {{ name }} does not see two storage fabrics"
+    success_msg: "NetApp Cluster {{ name }} does correctly see two storage fabrics"
+
+#- name: Get Fibre Channel Fabric Zones
+#  uri:
+#    url: "https://{{ clusterIP }}:443/api/network/fc/fabrics/{{ item.name }}/zones"
+#    method: GET
+#    return_content: yes
+#    url_username: "{{ username }}"
+#    url_password: "{{ password }}"
+#    validate_certs: false
+#  environment:
+#    no_proxy: "{{ lookup('env', 'no_proxy') + ',' + clusterIP }}"
+#  register: fc_fabrics_zones
+#  delegate_to: localhost
+#  loop: "{{ fc_fabrics.json.records }}"
+#
+#- name: Debug
+#  debug:
+#    msg: "{{ fc_fabrics_zones }}"
+
+- name: Get fcp zone show command output
+  netapp.ontap.na_ontap_command:
+    command: ["fcp zone show"]
+    hostname: "{{ clusterIP }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    https: yes
+    validate_certs: no
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+  register: fcp_zone_show_output
+  ignore_errors: True
+
+- name: Convert XML to JSON
+  set_fact:
+    fcp_zone_show_json: "{{ fcp_zone_show_output| to_nice_json }}"
+
+- name: Print Zones Output
+  debug:
+    msg: "{{ fcp_zone_show_json }}"
+
+- name: Check for errors in output
+  fail:
+    msg: "Storage Cluster {{ name }} has FPIN issue, please escalate to Storage team or use the procedure mentioned in the Handbook to reset the affected adapater/s"
+  when: "'timeout' in fcp_zone_show_json or 'query operation timed out or was rejected' in fcp_zone_show_json or 'Error' in fcp_zone_show_json"

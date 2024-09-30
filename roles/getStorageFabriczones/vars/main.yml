@@ -1,0 +1,4 @@
+clusterIP: 192.168.0.101
+hostname: cluster1.demo.netapp.com
+username: admin
+password: Netapp1!

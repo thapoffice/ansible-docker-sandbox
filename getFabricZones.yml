@@ -1,0 +1,5 @@
+---
+- name: Get SAN fabric zones
+  hosts: localhost
+  roles:
+    - getStorageFabriczones
