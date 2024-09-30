@@ -78,7 +78,7 @@
   loop: "{{ EverestBootQoSPolicies }}" 
 
 - name: Set boot volume QoS adaptive policy block size for Everest
-  netapp.ontap.na_ontap_command:
+  netapp.ontap.na_ontap_rest_cli:
     command: 'qos/adaptive-policy-group'
     verb: 'PATCH'
     params:
@@ -117,7 +117,7 @@
   loop: "{{ LambQoSPolicies }}"
 
 - name: Set QoS adaptive policy block size for Lamb
-  netapp.ontap.na_ontap_command:
+  netapp.ontap.na_ontap_rest_cli:
     command: 'qos/adaptive-policy-group'
     verb: 'PATCH'
     params:
