@@ -1,0 +1,134 @@
+---
+
+- name: Create adaptive QoS policy group
+  netapp.ontap.na_ontap_qos_policy_group:
+    state: present
+    name: "{{ item.name }}"
+    adaptive_qos_options:
+      expected_iops:  "{{ item.expected_iops }}"
+      peak_iops: "{{ item.peak_iops }}"
+      absolute_min_iops: "{{ item.absolute_min_iops }}"
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    vserver: svm1_cluster1
+    https: yes
+    validate_certs: no
+  #environment:
+  #  no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+  #when: svm.type == "flash" and svm.workloadProfile == "generic"
+  loop: "{{ EverestQoSPolicies }}" 
+
+- name: Set QoS adaptive policy block size for Everest
+  netapp.ontap.na_ontap_command:
+    command: ['qos adaptive-policy-group modify -policy-group {{ item.name }} -block-size {{ item.block_size }} -peak-iops-allocation {{ item.peak_iops_allocation }} -expected-iops-allocation {{ item.expected_iops_allocation }}']
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    https: yes
+    validate_certs: no
+  #environment:
+  #  no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+  #when: svm.type == "flash" and svm.workloadProfile == "generic"
+  loop: "{{ EverestQoSPolicies }}"  
+
+- name: Create HT volume QoS policy groups
+  netapp.ontap.na_ontap_qos_policy_group:
+    state: present
+    name: "{{ item.name }}"
+    fixed_qos_options: 
+      max_throughput_iops: "{{ item.max_throughput_iops }}"
+      max_throughput_mbps: "{{ item.max_throughput_mbps }}"
+      capacity_shared: "{{ item.capacity_shared }}"
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    vserver: "{{vserver}}"
+    https: yes
+    validate_certs: no
+  #environment:
+   # no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+  #when: svm.type == "flash" and svm.workloadProfile == "generic"
+  loop: "{{ EverestHTQoSPolicies }}" 
+
+- name: Create boot volume adaptive QoS policy group
+  netapp.ontap.na_ontap_qos_policy_group:
+    state: present
+    name: "{{ item.name }}"
+    adaptive_qos_options:
+      expected_iops:  "{{ item.expected_iops }}"
+      peak_iops: "{{ item.peak_iops }}"
+      absolute_min_iops: "{{ item.absolute_min_iops }}"
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    vserver: "{{vserver}}"
+    https: yes
+    validate_certs: no
+  #environment:
+  #  no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+  #when: svm.type == "flash" and svm.workloadProfile == "generic"
+  loop: "{{ EverestBootQoSPolicies }}" 
+
+- name: Set boot volume QoS adaptive policy block size for Everest
+  netapp.ontap.na_ontap_command:
+    command: ['qos adaptive-policy-group modify -policy-group {{ item.name }} -block-size {{ item.block_size }} -peak-iops-allocation {{ item.peak_iops_allocation }} -expected-iops-allocation {{ item.expected_iops_allocation }}']
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    https: yes
+    validate_certs: no
+  #environment:
+  #  no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+  #when: svm.type == "flash" and svm.workloadProfile == "generic"
+  loop: "{{ EverestBootQoSPolicies }}"
+
+- name: Create SAP adaptive QOS policy group for Lamb
+  netapp.ontap.na_ontap_qos_policy_group:
+    state: present
+    name: "{{ item.name }}"
+    adaptive_qos_options:
+      expected_iops:  "{{ item.expected_iops }}"
+      peak_iops: "{{ item.peak_iops }}"
+      absolute_min_iops: "{{ item.absolute_min_iops }}"
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    vserver: "{{vserver}}"
+    https: yes
+    validate_certs: no
+#  environment:
+#    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+#  when: svm.type == "flash" and createLambDefaultQoS and svm.workloadProfile == "hana"
+  loop: "{{ LambQoSPolicies }}"
+
+- name: Set QoS adaptive policy block size for Lamb
+  netapp.ontap.na_ontap_command:
+    command: ['qos adaptive-policy-group modify -policy-group {{ item.name }} -block-size {{ item.block_size }} -peak-iops-allocation {{ item.peak_iops_allocation }} -expected-iops-allocation {{ item.expected_iops_allocation }}']
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    https: yes
+    validate_certs: no
+#  environment:
+#    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+#  when: svm.type == "flash" and createLambDefaultQoS and svm.workloadProfile == "hana"
+  loop: "{{ LambQoSPolicies }}"
+
+- name: Get NetApp info 
+  netapp.ontap.na_ontap_info:
+    state: info
+    hostname: "{{hostname}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    continue_on_error: "rpc_error"
+    https: yes
+    validate_certs: no
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + hostname }}"
+  register: ontap_info
+
+- name: Output netapp info
+  debug:
+    msg: "{{ ontap_info.ontap_info }}"
+    verbosity: 1

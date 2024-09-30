@@ -1,0 +1,117 @@
+# variables go to here
+
+vserver: smv1_cluster1
+createLambDefaultQoS: true
+
+clusterName: "{{name}}"
+clusterIP: 192.168.0.101
+hostname: cluster1.demo.netapp.com
+username: admin
+password: Netapp1!
+
+EverestQoSPolicies:
+  - name: "7200peakIOPSPerTB_{{svm.netappAlias}}"
+    expected_iops: 1500
+    peak_iops: 7200
+    expected_iops_allocation: allocated_space
+    peak_iops_allocation: allocated_space
+    absolute_min_iops: 1000
+    block_size: 8K
+  - name: "everest_perf_256mibps_{{svm.netappAlias}}"
+    expected_iops: 1500
+    peak_iops: 8192
+    expected_iops_allocation: allocated_space
+    peak_iops_allocation: allocated_space
+    absolute_min_iops: 1000
+    block_size: 32K
+
+EverestHTQoSPolicies:
+  - name: "everestHighPerfData_1TB_{{svm.netappAlias}}"
+    max_throughput_iops: 7200 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_2TB_{{svm.netappAlias}}"
+    max_throughput_iops: 14400 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_3TB_{{svm.netappAlias}}"
+    max_throughput_iops: 21600 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_4TB_{{svm.netappAlias}}"
+    max_throughput_iops: 28800 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_5TB_{{svm.netappAlias}}"
+    max_throughput_iops: 36000 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_6TB_{{svm.netappAlias}}"
+    max_throughput_iops: 43200 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_7TB_{{svm.netappAlias}}"
+    max_throughput_iops: 50400 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_8TB_{{svm.netappAlias}}"
+    max_throughput_iops: 57600 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_9TB_{{svm.netappAlias}}"
+    max_throughput_iops: 64800 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_10TB_{{svm.netappAlias}}"
+    max_throughput_iops: 72000 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_11TB_{{svm.netappAlias}}"
+    max_throughput_iops: 79200 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_12TB_{{svm.netappAlias}}"
+    max_throughput_iops: 86400 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_13TB_{{svm.netappAlias}}"
+    max_throughput_iops: 93600 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_14TB_{{svm.netappAlias}}"
+    max_throughput_iops: 100800 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_15TB_{{svm.netappAlias}}"
+    max_throughput_iops: 108000 
+    max_throughput_mbps: 900
+    capacity_shared: false
+  - name: "everestHighPerfData_16TB_{{svm.netappAlias}}"
+    max_throughput_iops: 115200 
+    max_throughput_mbps: 900
+    capacity_shared: false
+
+EverestBootQoSPolicies:
+  - name: "everestBoot_{{svm.netappAlias}}"
+    expected_iops: 1500
+    peak_iops: 7200
+    expected_iops_allocation: allocated_space
+    peak_iops_allocation: allocated_space
+    absolute_min_iops: 1000
+    block_size: 32K
+  - name: "everestPerfBoot_{{svm.netappAlias}}"
+    expected_iops: 1500
+    peak_iops: 8192
+    expected_iops_allocation: allocated_space
+    peak_iops_allocation: allocated_space
+    absolute_min_iops: 1000
+    block_size: 32K
+
+LambQoSPolicies:
+  - name: "hana_adaptive_{{svm.netappAlias}}"
+    expected_iops: 1500
+    peak_iops: 7200
+    peak_iops_allocation: allocated_space
+    expected_iops_allocation: allocated_space
+    absolute_min_iops: 1000
+    block_size: 8K
