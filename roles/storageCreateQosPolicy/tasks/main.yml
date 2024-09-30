@@ -20,7 +20,7 @@
   loop: "{{ EverestQoSPolicies }}" 
 
 - name: Set QoS adaptive policy block size for Everest
-  netapp.ontap.na_ontap_command:
+  netapp.ontap.na_ontap_rest_cli:
     command: 'qos/adaptive-policy-group'
     verb: 'PATCH'
     params:
