@@ -21,7 +21,13 @@
 
 - name: Set QoS adaptive policy block size for Everest
   netapp.ontap.na_ontap_command:
-    command: ['qos adaptive-policy-group modify -policy-group {{ item.name }} -block-size {{ item.block_size }} -peak-iops-allocation {{ item.peak_iops_allocation }} -expected-iops-allocation {{ item.expected_iops_allocation }}']
+    command: 'qos/adaptive-policy-group'
+    verb: 'PATCH'
+    params:
+      policy-group: "{{ item.name }}"
+      block-size: "{{ item.block_size }}"
+      peak-iops-allocation: "{{ item.peak_iops_allocation }}"
+      expected-iops-allocation: "{{ item.expected_iops_allocation }}"
     hostname: "{{hostname}}"
     username: "{{username}}"
     password: "{{password}}"
@@ -43,7 +49,7 @@
     hostname: "{{hostname}}"
     username: "{{username}}"
     password: "{{password}}"
-    vserver: "{{vserver}}"
+    vserver: svm_cluster1
     https: yes
     validate_certs: no
   #environment:
@@ -62,7 +68,7 @@
     hostname: "{{hostname}}"
     username: "{{username}}"
     password: "{{password}}"
-    vserver: "{{vserver}}"
+    vserver: svm_cluster1
     https: yes
     validate_certs: no
   #environment:
@@ -94,7 +100,7 @@
     hostname: "{{hostname}}"
     username: "{{username}}"
     password: "{{password}}"
-    vserver: "{{vserver}}"
+    vserver: svm_cluster1
     https: yes
     validate_certs: no
 #  environment:
