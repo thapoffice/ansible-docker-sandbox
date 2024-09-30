@@ -63,3 +63,21 @@
   fail:
     msg: "Storage Cluster {{ name }} has FPIN issue, please escalate to Storage team or use the procedure mentioned in the Handbook to reset the affected adapater/s"
   when: "'timeout' in fcp_zone_show_json or 'query operation timed out or was rejected' in fcp_zone_show_json or 'Error' in fcp_zone_show_json"
+
+#RESTORE SNAPSHOT 
+- name: Restore from snapshot
+  netapp.ontap.na_ontap_rest_cli:
+    command: 'snapshot/restore'
+    verb: 'POST'
+    params:
+      vserver: svm1_cluster1 
+      volume: HITESH_e14219355
+      snapshot: daily.2024-09-29_0010
+    #privilege: advanced
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"
+    https: yes
+    validate_certs: no
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
