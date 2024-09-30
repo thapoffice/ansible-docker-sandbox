@@ -39,7 +39,7 @@
 
 - name: Get fcp zone show command output
   netapp.ontap.na_ontap_rest_cli:
-    command: 'fcp/zone'
+    command: 'network/fcp/zone'
     verb: 'GET'
     hostname: "{{ clusterIP }}"
     username: "{{ username }}"
