@@ -17,7 +17,7 @@
     username: "{{ username }}"
     password: "{{ password }}"
     gather_subset:
-      - network/fcp/fabrics
+      - network/fc/fabrics
     https: true
     validate_certs: false
   register: fc_fabrics_1
