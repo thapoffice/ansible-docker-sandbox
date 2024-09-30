@@ -79,7 +79,14 @@
 
 - name: Set boot volume QoS adaptive policy block size for Everest
   netapp.ontap.na_ontap_command:
-    command: ['qos adaptive-policy-group modify -policy-group {{ item.name }} -block-size {{ item.block_size }} -peak-iops-allocation {{ item.peak_iops_allocation }} -expected-iops-allocation {{ item.expected_iops_allocation }}']
+    command: 'qos/adaptive-policy-group'
+    verb: 'PATCH'
+    params:
+      policy-group: "{{ item.name }}"
+    body:
+      block-size: "{{ item.block_size }}"
+      peak-iops-allocation: "{{ item.peak_iops_allocation }}"
+      expected-iops-allocation: "{{ item.expected_iops_allocation }}"
     hostname: "{{hostname}}"
     username: "{{username}}"
     password: "{{password}}"
@@ -111,7 +118,14 @@
 
 - name: Set QoS adaptive policy block size for Lamb
   netapp.ontap.na_ontap_command:
-    command: ['qos adaptive-policy-group modify -policy-group {{ item.name }} -block-size {{ item.block_size }} -peak-iops-allocation {{ item.peak_iops_allocation }} -expected-iops-allocation {{ item.expected_iops_allocation }}']
+    command: 'qos/adaptive-policy-group'
+    verb: 'PATCH'
+    params:
+      policy-group: "{{ item.name }}"
+    body:
+      block-size: "{{ item.block_size }}"
+      peak-iops-allocation: "{{ item.peak_iops_allocation }}"
+      expected-iops-allocation: "{{ item.expected_iops_allocation }}"
     hostname: "{{hostname}}"
     username: "{{username}}"
     password: "{{password}}"
@@ -124,7 +138,6 @@
 
 - name: Get NetApp info 
   netapp.ontap.na_ontap_info:
-    state: info
     hostname: "{{hostname}}"
     username: "{{username}}"
     password: "{{password}}"
