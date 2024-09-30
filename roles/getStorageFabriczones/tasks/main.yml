@@ -18,7 +18,7 @@
 - name: Assert that two fabrics are returned
   assert:
     that:
-      - fc_fabrics.json.records | length == 4
+      - fc_fabrics.json.records | length == 8
     fail_msg: "NetApp Cluster {{ hostname }} does not see two storage fabrics"
     success_msg: "NetApp Cluster {{ hostname }} does correctly see two storage fabrics"
 
