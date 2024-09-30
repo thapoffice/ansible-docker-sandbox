@@ -1,2 +1,3 @@
 ---
-svm.netappAlias: svm1_cluster1
+svm:
+  netappAlias: svm1_cluster1
