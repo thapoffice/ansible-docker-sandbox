@@ -1,6 +1,8 @@
 # variables go to here
 
-vserver: smv1_cluster1
+svm.netappAlias: svm1_cluster1
+
+vserver: "{{svm.netappAlias}}"
 createLambDefaultQoS: true
 
 clusterName: "{{name}}"
