@@ -11,6 +11,21 @@
   register: fc_fabrics
   delegate_to: localhost
 
+- name: Get Fibre channel fabrics using rest_info module
+  netapp.ontap.na_ontap_rest_info:
+    hostname: "{{ clusterIP }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    gather_subset:
+      - network/fcp/fabrics
+    https: true
+    validate_certs: false
+  register: fc_fabrics_1
+
+- name: Debug
+  debug:
+    msg: "{{ fc_fabrics_1 }}"
+
 - name: Debug
   debug:
     msg: "{{ fc_fabrics }}"
