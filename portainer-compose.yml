@@ -4,7 +4,7 @@ volumes:
 
 services:
   portainer-app:
-    image: portainer-ce:latest
+    image: portainer/portainer-ce:latest
     container_name: portainer-app
     restart: always
     volumes:
