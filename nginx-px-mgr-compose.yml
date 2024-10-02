@@ -20,9 +20,9 @@ services:
     environment:
       - DB_MYSQL_HOST=npm-db
       - DB_MYSQL_PORT=3306
-      - DB_MYSQL_USER=Aerospace4253
-      - DB_MYSQL_PASSWORD=kljKbWEVJ*TC&dPrMstr!t#F94F$Hu
-      - DB_MYSQL_NAME=Jokester5229
+      - DB_MYSQL_USER="Aerospace4253"
+      - DB_MYSQL_PASSWORD="kljKbWEVJ*TC&dPrMstr!t#F94F$Hu"
+      - DB_MYSQL_NAME="Jokester5229"
     volumes:
       - npm-data:/data
       - npm-ssl:/etc/letsencrypt
@@ -35,10 +35,10 @@ services:
     restart: always
     container_name: nginx-prxymgr-db
     environment:
-      - MYSQL_ROOT_PASSWORD=BX5trnmcDTYnrBV5kbZ5iV#gUy4pYT
-      - MYSQL_DATABASE=Jokester5229
-      - MYSQL_USER=Aerospace4253
-      - MYSQL_PASSWORD=kljKbWEVJ*TC&dPrMstr!t#F94F$Hu
+      - MYSQL_ROOT_PASSWORD="BX5trnmcDTYnrBV5kbZ5iV#gUy4pYT"
+      - MYSQL_DATABASE="Jokester5229"
+      - MYSQL_USER="Aerospace4253"
+      - MYSQL_PASSWORD="kljKbWEVJ*TC&dPrMstr!t#F94F$Hu"
     volumes:
       - npm-db:/var/lib/mysql
     networks:

@@ -1,0 +1,91 @@
+
+volumes:
+  npm-data:
+  npm-ssl:
+  npm-db:
+  portainer-data:
+  nextcloud-data:
+  nextcloud-db:
+
+networks:
+  frontend:
+  backend:
+
+services:
+  npm-app:
+    image: jc21/nginx-proxy-manager:latest
+    restart: always
+    container_name: nginx-prxymgr-app
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    environment:
+      - DB_MYSQL_HOST=npm-db
+      - DB_MYSQL_PORT=3306
+      - DB_MYSQL_USER=Aerospace4253
+      - DB_MYSQL_PASSWORD=kljKbWEVJ*TC&dPrMstr!t#F94FHu
+      - DB_MYSQL_NAME=Jokester5229
+    volumes:
+      - npm-data:/data
+      - npm-ssl:/etc/letsencrypt
+    networks:
+      - frontend
+      - backend
+
+  npm-db:
+    image: jc21/mariadb-aria:latest
+    restart: always
+    container_name: nginx-prxymgr-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=BX5trnmcDTYnrBV5kbZ5iV#gUy4pYT
+      - MYSQL_DATABASE=Jokester5229
+      - MYSQL_USER=Aerospace4253
+      - MYSQL_PASSWORD=kljKbWEVJ*TC&dPrMstr!t#F94FHu
+    volumes:
+      - npm-db:/var/lib/mysql
+    networks:
+      - backend
+
+  portainer-app:
+    image: portainer/portainer-ce:latest
+    container_name: portainer-app
+    restart: always
+    volumes:
+      - portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 8000:8000
+      - 9000:9000
+    networks:
+      - frontend
+
+  nextcloud-app:
+    image: nextcloud
+    restart: always
+    init: true
+    container_name: nextcloud-app
+    volumes:
+      - nextcloud-data:/var/www/html
+    environment:
+      - MYSQL_PASSWORD=BxFJhQEl96uR@4HKxxSCn8s2gbY*l
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_HOST=nextcloud-db
+    networks:
+        - frontend
+        - backend
+
+  nextcloud-db:
+    image: mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      - nextcloud-db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=uaL%lEcKsnu7PZCRcYa7&4JPjoivA
+      - MYSQL_PASSWORD=BxFJhQEl96uR@4HKxxSCn8s2gbY*l
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+    networks:
+      - backend
