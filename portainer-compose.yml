@@ -1,0 +1,15 @@
+---
+volumes:
+  portainer-data:
+
+services:
+  portainer-app:
+    image: portainer-ce:latest
+    container_name: portainer-app
+    restart: always
+    volumes:
+      - portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 8000:8000
+      - 9000:9000
