@@ -1,0 +1,383 @@
+### Create OCUM user
+# Configure OCUM user
+#- name: Set GCP secret names
+#  set_fact:
+#    global_ocum_user: "global-netapp-ocumAdmin"
+#  delegate_to: localhost
+#
+#- name: Get global OCUM user
+#  gcp_secret:
+#    action: "access"
+#    name: "{{ global_ocum_user }}"
+#  register: ocumUser
+#  delegate_to: localhost
+#  run_once: true
+
+#- name: Get component for awx in same project
+#  ansible.builtin.set_fact:
+#    my_component: "{{ lookup('get_nenv_components', 'awx', scope='self' ) }}"
+#
+#- name: Debug docs
+#  ansible.builtin.debug:
+#    var: my_component
+
+- name: Get environment and deployer facts
+  get_ansible_env:
+  delegate_to: localhost
+
+- name: Debug get_ansible_env output
+  ansible.builtin.debug:
+    var: ansible_facts
+    verbosity: 1
+
+- name: Set GCP secret names
+  ansible.builtin.set_fact:
+    ocum_admin_sa: "n-{{ ansible_facts.ENV_NAME }}-sa-ocum-ocum-admin"
+  delegate_to: localhost
+
+- name: Debug ocum sa account name
+  ansible.builtin.debug:
+    msg: "Account name is {{ ocum_admin_sa }}"
+    verbosity: 1
+
+- name: Get global OCUM user
+  gcp_secret:
+    action: "access"
+    name: "{{ ocum_admin_sa }}"
+  register: ocumUser
+  delegate_to: localhost
+  run_once: true
+
+- name: Create OCUM user
+  netapp.ontap.na_ontap_user:
+    state: present
+    name: "{{ocumUser.data.username}}"
+    application: http,ontapi
+    authentication_method: password
+    set_password: "{{ocumUser.data.password}}"
+    lock_user: False
+    role_name: admin
+    vserver: "{{clusterName}}"
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+### Create control plane user
+# Get current user from gcp secrets manager
+- name: Get current user from gcp secrets manager
+  gcp_secret:
+    action: "access"
+    name: "{{clusterName}}-controlplane"
+  register: user_secret
+  # no_log: "{{ disableLogging }}"
+  delegate_to: localhost
+
+# Set Control Plane user name
+- name: Set GCP secret names
+  set_fact:
+    control_plane_user: "{{clusterName}}-controlplane"
+  delegate_to: localhost
+  when: not user_secret.found
+
+# Generate a New password if the user does not exist
+- name: Create a random password
+  set_fact:
+    newPassword:  "{{ ((lookup('password', '/dev/null length=5 chars=ascii_letters') | lower) + (lookup('password', '/dev/null length=5 chars=ascii_letters') | upper) + lookup('password', '/dev/null length=4 chars=digits')) | shuffle | join('') }}"  
+  run_once: true
+  # no_log: "{{ disableLogging }}"
+  delegate_to: localhost
+  when: not user_secret.found
+
+- name: Set username
+  set_fact:
+    apiUser: "controlPlaneAdm"
+  delegate_to: localhost
+  when: not user_secret.found
+
+# Update the password in Secret manager if the user does not exist
+- name: Update the password in secret manager
+  gcp_secret:
+    action: "create"
+    name: "{{clusterName}}-controlplane"
+    secret:
+      username: "{{ apiUser }}"
+      password: "{{ newPassword }}"
+    labels:
+      datacenter: "{{bmaasMetadata.dataCenter.code}}"
+      scope: device
+      source: ansible
+      targetservice: netappclusters
+      targetdevice: "{{clusterName}}"
+      usergroup: controlplane     
+  # no_log: "{{ disableLogging }}"
+  delegate_to: localhost
+  when: not user_secret.found
+
+# Give permissions for volumes API directory
+- name: Create API User Role - volumes
+  netapp.ontap.na_ontap_command:
+    command: ["security login rest-role create -vserver {{clusterName}} -role controlPlaneRest -api /api/storage/volumes -access all"]
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Give permissions for SVMs API directory
+- name: Create API User Role - SVMs
+  netapp.ontap.na_ontap_command:
+    command: ["security login rest-role create -vserver {{clusterName}} -role controlPlaneRest -api /api/svm/svms -access all"]
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Give permissions for SVMs API directory
+- name: Create API User Role - SVMs
+  netapp.ontap.na_ontap_command:
+    command: ["security login rest-role create -vserver {{clusterName}} -role controlPlaneRest -api /api/svms -access all"]
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Give permissions for cron API directory
+- name: Create API User Role - cron
+  netapp.ontap.na_ontap_command:
+    command: ["security login rest-role create -vserver {{clusterName}} -role controlPlaneRest -api /api/cluster/schedules -access all"]
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Give permissions for snapshot policies API directory
+- name: Create API User Role - snapshot policies
+  netapp.ontap.na_ontap_command:
+    command: ["security login rest-role create -vserver {{clusterName}} -role controlPlaneRest -api /api/storage/snapshot-policies -access all"]
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Give permissions to see jobs
+- name: Create API User Role - snapshot policies
+  netapp.ontap.na_ontap_command:
+    command: ["security login rest-role create -vserver {{clusterName}} -role controlPlaneRest -api /api/cluster/jobs -access readonly"]
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+- name: Get control plane user
+  gcp_secret:
+    action: "access"
+    name: "{{clusterName}}-controlplane"
+  register: cpUser
+  delegate_to: localhost
+  run_once: true
+
+- name: Create control plane user
+  netapp.ontap.na_ontap_user:
+    state: present
+    name: "{{cpUser.data.username}}"
+    application: ontapi,http
+    authentication_method: password
+    set_password: "{{cpUser.data.password}}"
+    lock_user: False
+    role_name: controlPlaneRest
+    vserver: "{{clusterName}}"
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+### Create NetApp Harvest user
+# Give permissions to check Ontap version
+- name: Create User Role - version
+  netapp.ontap.na_ontap_user_role:
+    state: present
+    name: netapp-harvest-role
+    command_directory_name: "version"
+    access_level: readonly
+    vserver: "{{clusterName}}"
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Give permissions to check Ontap cluster identity
+- name: Create User Role - cluster identity
+  netapp.ontap.na_ontap_user_role:
+    state: present
+    name: netapp-harvest-role
+    command_directory_name: "cluster identity show"
+    access_level: readonly
+    vserver: "{{clusterName}}"
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Give permissions to check Ontap cluster
+- name: Create User Role - cluster show
+  netapp.ontap.na_ontap_user_role:
+    state: present
+    name: netapp-harvest-role
+    command_directory_name: "cluster show"
+    access_level: readonly
+    vserver: "{{clusterName}}"
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Give permissions to check nodes
+- name: Create User Role - system node show
+  netapp.ontap.na_ontap_user_role:
+    state: present
+    name: netapp-harvest-role
+    command_directory_name: "system node show"
+    access_level: readonly
+    vserver: "{{clusterName}}"
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Give permissions to check statistics
+- name: Create User Role - statistics
+  netapp.ontap.na_ontap_user_role:
+    state: present
+    name: netapp-harvest-role
+    command_directory_name: "statistics"
+    access_level: readonly
+    vserver: "{{clusterName}}"
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Give permissions to check luns
+- name: Create User Role - lun show
+  netapp.ontap.na_ontap_user_role:
+    state: present
+    name: netapp-harvest-role
+    command_directory_name: "lun show"
+    access_level: readonly
+    vserver: "{{clusterName}}"
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Give permissions to check interfaces
+- name: Create User Role - network interface show
+  netapp.ontap.na_ontap_user_role:
+    state: present
+    name: netapp-harvest-role
+    command_directory_name: "network interface show"
+    access_level: readonly
+    vserver: "{{clusterName}}"
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Give permissions to check qos
+- name: Create User Role - qos workload show
+  netapp.ontap.na_ontap_user_role:
+    state: present
+    name: netapp-harvest-role
+    command_directory_name: "qos workload show"
+    access_level: readonly
+    vserver: "{{clusterName}}"
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+# Create harvest user
+- name: Create harvest user
+  netapp.ontap.na_ontap_user:
+    state: present
+    name: "netapp-harvest"
+    application: ontapi
+    authentication_method: cert
+    #lock_user: False
+    role_name: "netapp-harvest-role"
+    vserver: "{{clusterName}}"
+    hostname: "{{clusterIP}}"
+    username: "{{username}}"
+    password: "{{password}}"  
+    https: yes
+    validate_certs: no
+  delegate_to: localhost
+  environment:
+    no_proxy: "{{ lookup('env','no_proxy') + ',' + clusterIP }}"
+
+### TO DO - add harvest certificate
+
